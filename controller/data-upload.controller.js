@@ -30,7 +30,7 @@ const result = excelToJson({
     }
 });
  
- console.log(result.Sheet1)
+ //console.log(result.Sheet1)
  uploadDataToDb(result.Sheet1,filePath) 
 }
 
@@ -50,27 +50,21 @@ async function uploadDataToDb(data,filePath){
 }
 
 async function saveCatogery(data){
-    for(let i in data){
-        catogeryModel.find().then(async rst=>{
-            //console.log(rst)
-            if(rst.length==0){
-                d={Catogery_name:data[i].Category}
-                data = new catogeryModel(d)
-                data.save()
+    var datas=data
+    for(let i in datas){
+        var categ=await datas[i].Category
+        //console.log(cat)
+      await  catogeryModel.findOne({Category_name:categ}).then(async rst=>{
+           // console.log(rst,"###",categ)
+            
+           // console.log(cat)
+            if(rst==null){
+               // console.log(data[i].Category)
+                d={Category_name:categ}
+                category = new catogeryModel(d);
+                category.save()
             }
-            else{
-             //console.log("else")
-             var cat=data[i].Category
-            await catogeryModel.findOne({Catogery_name:data[i].Category}).then(findOne_rst=>{
-                 console.log("**",rst)
-                 if(findOne_rst==null){
-                        d={Catogery_name:cat}
-                        data = new catogeryModel(d)
-                        data.save()
-                 }
-             })
            
-            }
         }).catch(err=>{
             console.log(err)
         })
@@ -79,9 +73,61 @@ async function saveCatogery(data){
 }
 
 async function saveBrand(data){
-
+    var datas=data
+    for(let i in datas){
+        var brand=await datas[i].Brand
+        //console.log(cat)
+      await  brandModel.findOne({brand_name:brand}).then(async rst=>{
+            console.log(rst,"###",brand)
+            
+           // console.log(cat)
+            if(rst==null){
+               // console.log(data[i].Category)
+               d={brand_name:brand}
+               data = new brandModel(d);
+                data.save()
+            }
+           
+        }).catch(err=>{
+            console.log(err)
+        })
+    }
+  
 }
 
 async function saveProduct(data){
+    let category=[]
+    let brand=[]
+    let product=data
+    category=await catogeryModel.find()
+    brand=await brandModel.find()
+
+   // console.log(brand)
+    //console.log(category)
+for(let k in product){
+
+ for(let c in category){
+    if(product[k].Category==category[c].Category_name){
+        product[k].Category=  category[c]._id
+    }
+}
+for(let b in brand){
+    if(product[k].Brand==brand[b].brand_name){
+        product[k].Brand=  brand[b]._id
+    }
+}
+//console.log(product[k])
+await productModel.findOneAndUpdate({ART_NO:product[k].ART_NO},product[k]).then(rst=>{
+    //console.log(rst)
+    if(rst==null){
+        prod = new productModel(product[k]);
+        prod.save() 
+    }else{
+        console.log(rst)
+    }
+}).catch(err=>{
+    console.log("err")
+})
+}
 
 }

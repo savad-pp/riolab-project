@@ -10,12 +10,36 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
+        <style>
+            th, td, p, input {
+                font:14px Verdana;
+            }
+            table, th, td 
+            {
+                border: solid 1px #DDD;
+                border-collapse: collapse;
+                padding: 2px 3px;
+                text-align: center;
+            }
+            th {
+                font-weight:bold;
+            }
+        </style>
     </head>
     <body>
+        <div style="text-align: center;">
         <form id="form" action="/" method="post" enctype="multipart/form-data">
             <input type="file" name="filetoupload" id="filetoupload"><br>
             <input type="submit" id="submit">
+            <br>
+            <br>
+            <input type="button" id="result" value="result">
         </form>
+    </div>
+       
+        <p id="showCategoryData"></p>
+        <p id="showBrandData"></p>
+        <p id="showProductData"></p>
         <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script>
@@ -32,20 +56,13 @@
                     // console.log(formData);
                     
                     var file = $('#form')[0][0].files[0];
-
-                    // console.log(file);
-                    // console.log(file instanceof Blob);
-                    // console.log(typeof(file));
                     var workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
-                   // console.log(workbook);
+                 
                     var wopts = { bookType:'xlsx', bookSST:false, type:'base64' };
                     var wbout = XLSX.write(workbook,wopts);
-                    //console.log(typeof(wbout));
-                   // console.log(wbout instanceof Blob);
+                 
                     var blob = new Blob([wbout], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
                     var formData = new FormData();
-                    
-                    // formData.append('filetoupload', blob, 'test.xlsx');
                     formData.append('file', 'data.xlsx');
                     formData.append('data', wbout);
 
@@ -60,8 +77,158 @@
                             contentType: false,
                             processData: false
                     });
+                  
                 });
+                $('#result').click(async function (e) {
+                    e.preventDefault();
+                    $.ajax({
+                            url: '/category',  
+                            type: 'GET',
+                           
+                            success:function(data){
+                                //console.log(data.result);
+                                createCategoryTable(data.result)
+                                
+                            },
+                            cache: false,
+                            contentType: false,
+                            processData: false
+                    });
+                    $.ajax({
+                            url: '/brand',  
+                            type: 'GET',
+                           
+                            success:function(data){
+                                //console.log(data.result);
+                                createBrandTable(data.result)
+                                
+                            },
+                            cache: false,
+                            contentType: false,
+                            processData: false
+                    });
+                    $.ajax({
+                            url: '/product',  
+                            type: 'GET',
+                           
+                            success:function(data){
+                                console.log(data.result);
+                                createProductTable(data.result)
+                                
+                            },
+                            cache: false,
+                            contentType: false,
+                            processData: false
+                    });
+                })
             });
+
+function createCategoryTable(data){
+           var cat = new Array();
+           cat=data
+            var col = [];
+        for (var i = 0; i < cat.length; i++) {
+            for (var key in cat[i]) {
+                if (col.indexOf(key) === -1) {
+                    col.push(key);
+                }
+            }
+        }
+          var table = document.createElement("table");
+
+var tr = table.insertRow(-1);                  
+
+for (var i = 0; i < col.length; i++) {
+    var th = document.createElement("th");      
+    th.innerHTML = col[i];
+    tr.appendChild(th);
+}
+ for (var i = 0; i < cat.length; i++) {
+
+tr = table.insertRow(-1);
+
+for (var j = 0; j < col.length; j++) {
+    var tabCell = tr.insertCell(-1);
+    tabCell.innerHTML = cat[i][col[j]];
+}
+}
+var divContainer = document.getElementById("showCategoryData");
+divContainer.innerHTML = "";
+divContainer.appendChild(table);
+
+            }
+////////
+            function createBrandTable(data){
+           var brand = new Array();
+           brand=data
+            var col = [];
+        for (var i = 0; i < brand.length; i++) {
+            for (var key in brand[i]) {
+                if (col.indexOf(key) === -1) {
+                    col.push(key);
+                }
+            }
+        }
+          var table = document.createElement("table");
+
+var tr = table.insertRow(-1);                  
+
+for (var i = 0; i < col.length; i++) {
+    var th = document.createElement("th");      
+    th.innerHTML = col[i];
+    tr.appendChild(th);
+}
+ for (var i = 0; i < brand.length; i++) {
+
+tr = table.insertRow(-1);
+
+for (var j = 0; j < col.length; j++) {
+    var tabCell = tr.insertCell(-1);
+    tabCell.innerHTML = brand[i][col[j]];
+}
+}
+var divContainer = document.getElementById("showBrandData");
+divContainer.innerHTML = "";
+divContainer.appendChild(table);
+
+            }
+            ////
+            function createProductTable(data){
+           var prod = new Array();
+           prod=data
+            var col = [];
+        for (var i = 0; i < prod.length; i++) {
+            for (var key in prod[i]) {
+                if (col.indexOf(key) === -1) {
+                    col.push(key);
+                }
+            }
+        }
+          var table = document.createElement("table");
+
+var tr = table.insertRow(-1);                  
+
+for (var i = 0; i < col.length; i++) {
+    var th = document.createElement("th");      
+    th.innerHTML = col[i];
+    tr.appendChild(th);
+}
+ for (var i = 0; i < prod.length; i++) {
+
+tr = table.insertRow(-1);
+
+for (var j = 0; j < col.length; j++) {
+    var tabCell = tr.insertCell(-1);
+    tabCell.innerHTML = prod[i][col[j]];
+}
+}
+var divContainer = document.getElementById("showProductData");
+divContainer.innerHTML = "";
+divContainer.appendChild(table);
+
+            }
+
+            
         </script>
     </body>
 </html>

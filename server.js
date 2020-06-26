@@ -8,6 +8,9 @@ app.use(bodyparser.urlencoded({ extended: true }));
 var formidable = require('formidable');
 var fs = require('fs');
 require('./controller/data-upload.controller')
+const brandModel=require('./model/brand.model')
+const catogeryModel=require('./model/catogery.model')
+const productModel=require('./model/product.model')
 
 app.get('/', (req, res) => res.sendFile(__dirname +'/index.html'))
 
@@ -25,8 +28,27 @@ app.post('/upload',(req,res) => {
       //console.log(files);
      // console.log(fields);
       base64_decode(fields.data, 'Data.xlsx'); 
+      res.json({message:"success"})
 })
 })
+
+app.get('/category',(req,res) => {
+    catogeryModel.find().then(rst=>{
+        res.json({result:rst})
+    })  
+})
+app.get('/brand',(req,res) => {
+    brandModel.find().then(rst=>{
+        res.json({result:rst})
+    })  
+})
+app.get('/product',(req,res) => {
+    productModel.find().then(rst=>{
+        res.json({result:rst})
+    })  
+})
+
+
 app.listen(port,()=>{
     console.log(`App listening on port ${port}!`)       
 })

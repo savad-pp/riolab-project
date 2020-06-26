@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 const  product = new schema({
-    ART_NO: {type:Number,required:true},
+    ART_NO: {type:Number,required:true,unique:true},
     SKU_ID: {type:String},
     Special_Category: {type:String},
     Category: {type:String},

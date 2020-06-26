@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 const  catogery = new schema({
-    Catogery_name: {type:String,required:true},
+    Category_name: {type:String,unique:true},
     
    
 });
